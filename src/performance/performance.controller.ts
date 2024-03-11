@@ -42,9 +42,9 @@ export class PerformanceController {
   }
 
   //공연 키워드 조회
-  @Get('keyword?')
-  async Keyword(@Query('title') title: string) {
-    return this.performanceService.FindByKeyword(title);
+  @Get('/search?')
+  async Keyword(@Query('keyword') keyword: string) {
+    return await this.performanceService.findByKeyword(keyword);
   }
 
   // 공연 상세보기

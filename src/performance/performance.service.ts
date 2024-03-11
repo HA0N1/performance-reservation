@@ -47,7 +47,16 @@ export class PerformanceService {
     });
   }
   /**공연 키워드 */
-  async FindByKeyword(title: string) {}
+  async findByKeyword(title: string) {
+    const performances = await this.findAll();
+    const keywordPerformances = performances.filter((performance) =>
+      performance.title.includes(title),
+    );
+    return keywordPerformances;
+  }
+  // await this.performanceRepository.find({ where: { title }});
+  // return performance;
+
   /**공연 상세 조회 */
   async findOne(id: number) {
     if (_.isNaN(id))
@@ -75,7 +84,7 @@ export class PerformanceService {
         throw new NotFoundException('존재하지 않는 공연입니다.');
       /**
        * 1. ticket table 데이터 생성.
-       * - point Table 조회
+       * - 예매 가능 좌석 정보 조회 -> 자리 예약 -> point 조회 -> 차감 -> ticket 데이터 생성
        * - 일단 좌석 지정 없이 remainedSeat 카운팅만 줄이기.
        * - userId, performanceId, (seatId), price, quantity
        */

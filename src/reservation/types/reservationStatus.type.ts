@@ -1,4 +1,4 @@
 export enum Status {
-  Use,
-  Unused,
+  Use = 'use',
+  Unused = 'un-used',
 }

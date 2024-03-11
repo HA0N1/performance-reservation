@@ -5,10 +5,11 @@ import { PassportModule } from '@nestjs/passport';
 
 import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from 'src/user/user.module';
+import { PerformanceModule } from 'src/performance/performance.module';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt', session: false }),
+    PassportModule.register({ defaultStrategy: 'jwt', session: false }), // jwt사용
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET_KEY'),
@@ -17,6 +18,7 @@ import { UserModule } from 'src/user/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    PerformanceModule,
   ],
   providers: [JwtStrategy],
 })

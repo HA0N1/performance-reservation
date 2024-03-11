@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -11,15 +19,23 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/register')
-  async createUser(@Body() createUserDto: CreateUserDto) {
+  async createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     return await this.userService.register(createUserDto);
   }
+
   @Post('/login')
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(@Body(ValidationPipe) loginUserDto: LoginUserDto) {
     return await this.userService.login(loginUserDto);
   }
+  // @Post('test')
+  // @UseGuards(AuthGuard('jwt'))
+  // test(@UserInfo() user: User) {
+  //   console.log(user);
+  // }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('/me')
+  //커스텀 데코레이터
   async getEmail(@UserInfo() user: User) {
     const userInfoWithPoints = await this.userService.getUserAndPoints(user.id);
     return {

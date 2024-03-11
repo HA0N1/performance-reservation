@@ -34,7 +34,7 @@ export class Point {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User, (user) => user.point)
+  @OneToOne(() => User, (user) => user.point, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

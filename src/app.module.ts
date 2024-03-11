@@ -17,6 +17,7 @@ import { Reservation } from './reservation/entities/reservation.entity';
 import { ReservationModule } from './reservation/reservation.module';
 import { Seat } from './seat/entities/seat.entity';
 import { SeatModule } from './seat/seat.module';
+import { DataSource } from 'typeorm';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -62,4 +63,6 @@ const typeOrmModuleOptions = {
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}

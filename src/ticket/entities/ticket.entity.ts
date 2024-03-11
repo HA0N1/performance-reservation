@@ -11,6 +11,7 @@ import {
 import { Performance } from '../../performance/entities/performance.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity({
   name: 'ticket',
@@ -41,4 +42,8 @@ export class Ticket {
   @OneToMany(() => Seat, (seat) => seat.ticket)
   @JoinColumn({ name: 'seatId' })
   seat: Seat;
+
+  @OneToOne(() => User, (user) => user.ticket)
+  @JoinColumn({ name: 'UserId' })
+  user: User;
 }

@@ -1,13 +1,18 @@
 import { Point } from 'src/point/entities/point.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
+import { Performance } from '../../performance/entities/performance.entity';
+
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Ticket } from 'src/ticket/entities/ticket.entity';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -32,9 +37,15 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
+  @ManyToOne(() => Performance, (performance) => performance.user)
+  performance: Performance;
+
   @OneToOne(() => Point, (point) => point.user)
   point: Point;
 
-  @OneToOne(() => Reservation, (reservation) => reservation.userId)
-  reservation: Reservation;
+  @OneToMany(() => Reservation, (reservation) => reservation.user)
+  reservation: Reservation[];
+
+  @OneToOne(() => Ticket, (ticket) => ticket.user)
+  ticket: Ticket;
 }

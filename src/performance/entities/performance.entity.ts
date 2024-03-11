@@ -6,9 +6,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity({
   name: 'performance',
@@ -16,6 +18,9 @@ import {
 export class Performance {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'int', name: 'userId' })
+  userId: number;
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
@@ -46,6 +51,10 @@ export class Performance {
 
   @OneToMany(() => Reservation, (reservation) => reservation.performance)
   reservation: Reservation[];
+
+  @OneToMany(() => User, (user) => user.performance)
+  @JoinColumn({ name: 'userId' })
+  user: User[];
 
   @OneToMany(() => Ticket, (ticket) => ticket.performance)
   ticket: Ticket[];

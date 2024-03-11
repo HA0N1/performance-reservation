@@ -40,7 +40,7 @@ export class Reservation {
   @JoinColumn({ name: 'performanceId' })
   performance: Performance;
 
-  @OneToOne(() => User, (user) => user.reservation)
+  @ManyToOne(() => User, (user) => user.reservation)
   @JoinColumn({ name: 'userId' })
   user: User;
 

@@ -43,14 +43,20 @@ export class Performance {
   @Column({ type: 'varchar', nullable: false })
   hall: string;
 
-  @Column({ type: 'bigint', nullable: false })
-  remainedSeat: number;
+  @Column({ type: 'int', name: 'standardLimit', nullable: false })
+  standardLimit: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({ type: 'int', name: 'royalLimit', nullable: false })
+  royalLimit: number;
+
+  @Column({ type: 'int', name: 'vipLimit', nullable: false })
+  vipLimit: number;
 
   @OneToMany(() => Reservation, (reservation) => reservation.performance)
   reservation: Reservation[];
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @OneToMany(() => User, (user) => user.performance)
   @JoinColumn({ name: 'userId' })

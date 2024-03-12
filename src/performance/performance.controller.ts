@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/user/utils/userInfo.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { CreateReservationDto } from './dto/create-reservation.dto';
+import { CreateSeatDto } from './dto/create-seat.dto';
 
 @Controller('performance')
 export class PerformanceController {
@@ -54,8 +55,15 @@ export class PerformanceController {
   }
 
   // 공연 예매
+  @UseGuards(AuthGuard('jwt'))
   @Post(':id/reservation')
-  async reservation(@Body() createReservationDto: CreateReservationDto) {
-    return await this.performanceService.reservation(createReservationDto.id);
+  async reservation(
+    @Body() createReservationDto: CreateReservationDto,
+    @UserInfo() user: User,
+  ) {
+    return await this.performanceService.reservation(
+      createReservationDto,
+      user.id,
+    );
   }
 }

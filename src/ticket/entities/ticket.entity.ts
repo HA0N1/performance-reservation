@@ -26,6 +26,9 @@ export class Ticket {
   @Column({ type: 'int', name: 'seatId' })
   seatId: number;
 
+  @Column({ type: 'int', name: 'userId' })
+  userId: number;
+
   @Column({ type: 'bigint', nullable: false })
   price: number;
 
@@ -43,7 +46,7 @@ export class Ticket {
   @JoinColumn({ name: 'seatId' })
   seat: Seat;
 
-  @OneToOne(() => User, (user) => user.ticket)
-  @JoinColumn({ name: 'UserId' })
-  user: User;
+  @OneToMany(() => User, (user) => user.ticket)
+  @JoinColumn({ name: 'userId' })
+  user: User[];
 }

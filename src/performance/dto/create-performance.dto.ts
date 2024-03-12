@@ -40,6 +40,14 @@ export class CreatePerformanceDto {
   hall: string;
 
   @IsNumber()
-  @IsNotEmpty({ message: '좌석 수를 지정해주세요.' })
-  remainedSeat: number;
+  @IsNotEmpty({ message: 'STANDARD 좌석 수를 지정해주세요.' })
+  standardLimit: number;
+
+  @IsNumber()
+  @IsNotEmpty({ message: 'ROYAL 좌석 수를 지정해주세요.' })
+  royalLimit: number;
+
+  @IsNumber()
+  @IsNotEmpty({ message: 'VIP 좌석 수를 지정해주세요.' })
+  vipLimit: number;
 }

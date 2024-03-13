@@ -7,9 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Performance } from '../../performance/entities/performance.entity';
-import { Ticket } from 'src/ticket/entities/ticket.entity';
+import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Grade } from '../types/seat-grade.type';
-import { Status } from 'src/reservation/types/reservationStatus.type';
 
 @Entity({
   name: 'seat',
@@ -37,6 +36,6 @@ export class Seat {
   @JoinColumn({ name: 'performanceId' })
   performance: Performance;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.seat)
-  ticket: Ticket;
+  @ManyToOne(() => Reservation, (reservation) => reservation.seat)
+  reservation: Reservation;
 }

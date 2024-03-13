@@ -10,11 +10,10 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Performance } from './entities/performance.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
-import { Ticket } from 'src/ticket/entities/ticket.entity';
 import { Point } from 'src/point/entities/point.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
-import { CreateSeatDto } from './dto/create-seat.dto';
-import { Grade } from 'src/seat/types/seat-grade.type';
+import { Reservation } from 'src/reservation/entities/reservation.entity';
+
 @Injectable()
 export class PerformanceService {
   constructor(
@@ -23,8 +22,8 @@ export class PerformanceService {
     private readonly performanceRepository: Repository<Performance>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Ticket)
-    private readonly ticketRepository: Repository<Ticket>,
+    @InjectRepository(Reservation)
+    private readonly reservationRepository: Repository<Reservation>,
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
     @InjectRepository(Point)
@@ -93,6 +92,7 @@ export class PerformanceService {
     const performance = await this.verifyPerformanceById(id);
     if (_.isNil(performance))
       throw new NotFoundException('존재하지 않는 공연입니다.');
+
     // let reservableStandard: Array<any> = [];
     // let reservableRoyal: Array<any> = [];
     // let reservableVip: Array<any> = [];
@@ -126,10 +126,11 @@ export class PerformanceService {
     //   reservableVip.push(VipSeat[i].seatNum);
     // }
     // console.log('VIP 남은 좌석 :', reservableVip);
+
     // 예매 가능 좌석 조회
     const seats = await this.seatRepository.find({
-      where: { deletedAt: null },
-      select: ['performanceId', 'seatNum', 'grade', 'seatPrice'],
+      where: { performanceId: id, deletedAt: null },
+      select: ['seatNum', 'grade', 'seatPrice'],
     });
 
     return seats;
@@ -151,11 +152,11 @@ export class PerformanceService {
       if (_.isNil(performance))
         throw new NotFoundException('존재하지 않는 공연입니다.');
       const seats = await this.reservableSeat(performance.id);
+      console.log('PerformanceService ~ seats:', seats);
       let matchingSeat;
       for (const seat of seats) {
         if (
           seat.seatNum == createReservationDto.seatNum &&
-          seat.performanceId === createReservationDto.performanceId &&
           seat.grade === createReservationDto.grade
         ) {
           matchingSeat = seat;
@@ -174,37 +175,20 @@ export class PerformanceService {
       if (point.total < matchingSeat.seatPrice) {
         throw new BadRequestException('포인트가 부족합니다.');
       }
-      const totalPoint = point.total - matchingSeat.seatPrice;
-      console.log('PerformanceService ~ totalPoint:', totalPoint);
-      point.total = totalPoint;
       await queryRunner.manager.save(point);
 
-      // this.seatRepository.softDelete(matchingSeat);
+      this.seatRepository.softDelete(matchingSeat);
 
-      // point 조회 후 차감
-      // ticket table 데이터 생성
-      /*
-       * 1. ticket table 데이터 생성. - userId, performanceId, (seatId), price, quantity
-       * - 예매 가능 조회 -> 자리 예약 -> point 조회 -> 차감 -> ticket 데이터 생성
-       *
-       */
-
-      // await this.ticketRepository.insert({
-      //   userId: user.id,
-      //   performanceId: createReservationDto.performanceId,
-      //   seatId: createReservationDto.seatNum,
-      //   price: performance.price,
-      // });
-
-      // console.log('예매가 완료되었습니다.');
+      const totalPoint = point.total - matchingSeat.seatPrice;
+      point.total = totalPoint;
+      const reservation = await this.reservationRepository.create({
+        userId: user.id,
+        performanceId: createReservationDto.performanceId,
+        seatId: createReservationDto.seatNum,
+        price: matchingSeat.seatPrice,
+      });
+      await queryRunner.manager.save(reservation);
       await queryRunner.commitTransaction();
-      /**
-       * 2. reservation 데이터 생성
-       * - totalPrice = price * quantity
-       */
-      /**
-       * 3. reservation Table totalPrice만큼 point Table의 outcome + => total -= outcome
-       */
     } catch (err) {
       console.log(err);
       await queryRunner.rollbackTransaction();

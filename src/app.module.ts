@@ -11,13 +11,11 @@ import { Point } from './point/entities/point.entity';
 import { PointModule } from './point/point.module';
 import { Performance } from './performance/entities/performance.entity';
 import { PerformanceModule } from './performance/performance.module';
-import { TicketModule } from './ticket/ticket.module';
-import { Ticket } from './ticket/entities/ticket.entity';
-import { Reservation } from './reservation/entities/reservation.entity';
-import { ReservationModule } from './reservation/reservation.module';
 import { Seat } from './seat/entities/seat.entity';
 import { SeatModule } from './seat/seat.module';
 import { DataSource } from 'typeorm';
+import { Reservation } from './reservation/entities/reservation.entity';
+import { ReservationModule } from './reservation/reservation.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -30,7 +28,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [User, Point, Reservation, Ticket, Seat, Performance],
+    entities: [User, Point, Reservation, Seat, Performance],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -56,7 +54,6 @@ const typeOrmModuleOptions = {
     UserModule,
     PointModule,
     PerformanceModule,
-    TicketModule,
     ReservationModule,
     SeatModule,
   ],

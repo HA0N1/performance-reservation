@@ -1,6 +1,5 @@
-import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
-import { Ticket } from 'src/ticket/entities/ticket.entity';
+
 import { Category } from 'src/performance/types/performanceCategory.type';
 import {
   Column,
@@ -11,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Reservation } from 'src/reservation/entities/reservation.entity';
 
 @Entity({
   name: 'performance',
@@ -52,9 +52,6 @@ export class Performance {
   @Column({ type: 'int', name: 'vipLimit', nullable: false })
   vipLimit: number;
 
-  @OneToMany(() => Reservation, (reservation) => reservation.performance)
-  reservation: Reservation[];
-
   @CreateDateColumn()
   createdAt: Date;
 
@@ -62,8 +59,8 @@ export class Performance {
   @JoinColumn({ name: 'userId' })
   user: User[];
 
-  @OneToMany(() => Ticket, (ticket) => ticket.performance)
-  ticket: Ticket[];
+  @OneToMany(() => Reservation, (reservation) => reservation.performance)
+  reservation: Reservation[];
 
   @OneToMany(() => Seat, (seat) => seat.performance)
   seat: Seat[];

@@ -22,12 +22,6 @@ export class Point {
   @Column({ type: 'bigint', nullable: false })
   total: number;
 
-  @Column({ type: 'bigint', nullable: true, default: 0 })
-  income: number;
-
-  @Column({ type: 'bigint', nullable: true, default: 0 })
-  outcome: number;
-
   @CreateDateColumn()
   createdAt: Date;
 

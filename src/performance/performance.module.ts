@@ -8,10 +8,18 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Ticket } from 'src/ticket/entities/ticket.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
+import { Point } from 'src/point/entities/point.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Performance, User, Ticket, Reservation, Seat]),
+    TypeOrmModule.forFeature([
+      Performance,
+      User,
+      Ticket,
+      Reservation,
+      Seat,
+      Point,
+    ]),
   ],
   providers: [PerformanceService],
   controllers: [PerformanceController],

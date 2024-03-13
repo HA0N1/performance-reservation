@@ -27,6 +27,8 @@ export class PerformanceService {
     private readonly ticketRepository: Repository<Ticket>,
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
+    @InjectRepository(Point)
+    private readonly pointRepository: Repository<Point>,
   ) {}
   /**유저 찾기*/
   async findUser(id: number): Promise<{}> {
@@ -127,7 +129,7 @@ export class PerformanceService {
     // 예매 가능 좌석 조회
     const seats = await this.seatRepository.find({
       where: { deletedAt: null },
-      select: ['seatNum', 'grade', 'seatPrice'],
+      select: ['performanceId', 'seatNum', 'grade', 'seatPrice'],
     });
 
     return seats;
@@ -149,29 +151,35 @@ export class PerformanceService {
       if (_.isNil(performance))
         throw new NotFoundException('존재하지 않는 공연입니다.');
       const seats = await this.reservableSeat(performance.id);
-      // {
-      //   "seatNum": "1",
-      //   "grade": "STANDARD",
-      //   "seatPrice": 30000
-      // },
-      // {
-      //   "seatNum": "1",
-      //   "grade": "ROYAL",
-      //   "seatPrice": 45000
-      // },
-      // {
-      //   "seatNum": "2",
-      //   "grade": "VIP",
-      //   "seatPrice": 60000
-      // }
+      let matchingSeat;
+      for (const seat of seats) {
+        if (
+          seat.seatNum == createReservationDto.seatNum &&
+          seat.performanceId === createReservationDto.performanceId &&
+          seat.grade === createReservationDto.grade
+        ) {
+          matchingSeat = seat;
+          break;
+        }
+      }
+      if (!matchingSeat) {
+        throw new NotFoundException('해당하는 좌석이 없습니다.');
+      }
+      // 포인트 확인
+      const user = await this.getUserAndPoints(userId);
 
-      // {
-      //   "performanceId" : 1,
-      //   "seatNum" : 1,
-      //   "grade" : "STANDARD"
-      // }
-      // 자리예약 (동시성)
-      this.seatRepository.softDelete(seats[0]);
+      const point = await this.pointRepository.findOne({
+        where: { userId },
+      });
+      if (point.total < matchingSeat.seatPrice) {
+        throw new BadRequestException('포인트가 부족합니다.');
+      }
+      const totalPoint = point.total - matchingSeat.seatPrice;
+      console.log('PerformanceService ~ totalPoint:', totalPoint);
+      point.total = totalPoint;
+      await queryRunner.manager.save(point);
+
+      // this.seatRepository.softDelete(matchingSeat);
 
       // point 조회 후 차감
       // ticket table 데이터 생성
@@ -180,26 +188,13 @@ export class PerformanceService {
        * - 예매 가능 조회 -> 자리 예약 -> point 조회 -> 차감 -> ticket 데이터 생성
        *
        */
-      const user = await this.getUserAndPoints(userId);
 
-      // let point = user.point.total;
-      // const out = performance.price * createReservationDto.quantity;
-      // const newPointTotal = point - out;
-
-      // if (newPointTotal < 0) {
-      //   throw new BadRequestException('포인트가 부족합니다.');
-      // }
-
-      // user.point.total = newPointTotal;
-
-      // await queryRunner.manager.save(user);
-
-      await this.ticketRepository.insert({
-        userId: user.id,
-        performanceId: createReservationDto.performanceId,
-        seatId: createReservationDto.seatNum,
-        price: performance.price,
-      });
+      // await this.ticketRepository.insert({
+      //   userId: user.id,
+      //   performanceId: createReservationDto.performanceId,
+      //   seatId: createReservationDto.seatNum,
+      //   price: performance.price,
+      // });
 
       // console.log('예매가 완료되었습니다.');
       await queryRunner.commitTransaction();

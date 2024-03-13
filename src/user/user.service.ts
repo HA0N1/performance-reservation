@@ -40,7 +40,7 @@ export class UserService {
     await this.userRepository.save(user);
     const point = this.pointRepository.create({
       userId: user.id,
-      total: 1000000,
+      total: Number(1000000),
     });
     await this.pointRepository.save(point);
   }

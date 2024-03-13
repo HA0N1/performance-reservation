@@ -53,6 +53,11 @@ export class PerformanceController {
   async findOne(@Param('id') id: number) {
     return await this.performanceService.findOne(id);
   }
+  //
+  @Get('seat/:id')
+  async findSeat(@Param('id') id: number) {
+    return await this.performanceService.reservableSeat(id);
+  }
 
   // 공연 예매
   @UseGuards(AuthGuard('jwt'))

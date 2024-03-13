@@ -32,9 +32,6 @@ export class Ticket {
   @Column({ type: 'bigint', nullable: false })
   price: number;
 
-  @Column({ type: 'int', nullable: false })
-  quantity: number;
-
   @ManyToOne(() => Performance, (performance) => performance.ticket)
   @JoinColumn({ name: 'performanceId' })
   performance: Performance;

@@ -1,6 +1,6 @@
 import {
   Column,
-  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -30,8 +30,8 @@ export class Seat {
   @Column({ type: 'int', name: 'seatPrice', nullable: false })
   seatPrice: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 
   @ManyToOne(() => Performance, (performance) => performance.seat)
   @JoinColumn({ name: 'performanceId' })

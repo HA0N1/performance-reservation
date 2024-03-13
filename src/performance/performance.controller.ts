@@ -36,6 +36,7 @@ export class PerformanceController {
     );
     return { performanceId: performance.id };
   }
+
   // 공연 전체조회
   @Get('/')
   async findAll() {
@@ -52,23 +53,5 @@ export class PerformanceController {
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return await this.performanceService.findOne(id);
-  }
-  //
-  @Get('seat/:id')
-  async findSeat(@Param('id') id: number) {
-    return await this.performanceService.reservableSeat(id);
-  }
-
-  // 공연 예매
-  @UseGuards(AuthGuard('jwt'))
-  @Post(':id/reservation')
-  async reservation(
-    @Body() createReservationDto: CreateReservationDto,
-    @UserInfo() user: User,
-  ) {
-    return await this.performanceService.reservation(
-      createReservationDto,
-      user.id,
-    );
   }
 }

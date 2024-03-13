@@ -28,7 +28,7 @@ export class Performance {
   @Column({ type: 'text', nullable: false })
   description: string;
 
-  @Column({ type: 'enum', enum: Category, default: Category.Concert })
+  @Column({ type: 'enum', enum: Category, nullable: false })
   category: Category;
 
   @Column({ type: 'bigint', nullable: false })
@@ -62,6 +62,6 @@ export class Performance {
   @OneToMany(() => Reservation, (reservation) => reservation.performance)
   reservation: Reservation[];
 
-  @OneToMany(() => Seat, (seat) => seat.performance)
+  @OneToMany(() => Seat, (seat) => seat.performance, { onDelete: 'CASCADE' })
   seat: Seat[];
 }

@@ -22,16 +22,12 @@ export class PerformanceService {
     private readonly performanceRepository: Repository<Performance>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Reservation)
-    private readonly reservationRepository: Repository<Reservation>,
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
-    @InjectRepository(Point)
-    private readonly pointRepository: Repository<Point>,
   ) {}
   /**유저 찾기*/
   async findUser(id: number): Promise<{}> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user: User = await this.userRepository.findOneBy({ id });
     return user;
   }
   /**공연 생성 */
@@ -40,7 +36,7 @@ export class PerformanceService {
     id: number,
   ) {
     await this.findUser(id);
-    const performance = this.performanceRepository.create({
+    const performance: Performance = this.performanceRepository.create({
       ...createPerformanceDto,
       userId: +id,
     });
@@ -56,7 +52,7 @@ export class PerformanceService {
   }
   /**공연 키워드 */
   async findByKeyword(title: string) {
-    const performances = await this.findAll();
+    const performances: Array<Performance> = await this.findAll();
     const keywordPerformances = performances.filter((performance) =>
       performance.title.includes(title),
     );
@@ -89,43 +85,9 @@ export class PerformanceService {
   /**공연 좌석 조회 */
   async reservableSeat(id: number) {
     // 공연 존재 여부
-    const performance = await this.verifyPerformanceById(id);
+    const performance: Performance = await this.verifyPerformanceById(id);
     if (_.isNil(performance))
       throw new NotFoundException('존재하지 않는 공연입니다.');
-
-    // let reservableStandard: Array<any> = [];
-    // let reservableRoyal: Array<any> = [];
-    // let reservableVip: Array<any> = [];
-    // let standardSeat = seat.filter(
-    //   (standard) =>
-    //     standard.performanceId === performance.id &&
-    //     standard.grade === 'STANDARD' &&
-    //     standard.deletedAt === null,
-    // );
-    // for (let i = 0; i < standardSeat.length; i++) {
-    //   reservableStandard.push(standardSeat[i]);
-    // }
-    // console.log('STANDARD 남은 좌석 :', reservableStandard);
-    // let royalSeat = seat.filter(
-    //   (royal) =>
-    //     royal.performanceId === performance.id &&
-    //     royal.grade === 'ROYAL' &&
-    //     royal.deletedAt === null,
-    // );
-    // for (let i = 0; i < royalSeat.length; i++) {
-    //   reservableRoyal.push(royalSeat[i].seatNum);
-    // }
-    // console.log('ROYAL 남은 좌석 :', reservableRoyal);
-    // let VipSeat = seat.filter(
-    //   (vip) =>
-    //     vip.performanceId === performance.id &&
-    //     vip.grade === 'VIP' &&
-    //     vip.deletedAt === null,
-    // );
-    // for (let i = 0; i < standardSeat.length; i++) {
-    //   reservableVip.push(VipSeat[i].seatNum);
-    // }
-    // console.log('VIP 남은 좌석 :', reservableVip);
 
     // 예매 가능 좌석 조회
     const seats = await this.seatRepository.find({
@@ -136,70 +98,9 @@ export class PerformanceService {
     return seats;
   }
 
-  /**예매하기 transaction */
-  async reservation(
-    createReservationDto: CreateReservationDto,
-    userId: number,
-  ) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction('READ COMMITTED');
-    try {
-      // 공연 존재 여부
-      const performance = await this.verifyPerformanceById(
-        createReservationDto.performanceId,
-      );
-      if (_.isNil(performance))
-        throw new NotFoundException('존재하지 않는 공연입니다.');
-      const seats = await this.reservableSeat(performance.id);
-      console.log('PerformanceService ~ seats:', seats);
-      let matchingSeat;
-      for (const seat of seats) {
-        if (
-          seat.seatNum == createReservationDto.seatNum &&
-          seat.grade === createReservationDto.grade
-        ) {
-          matchingSeat = seat;
-          break;
-        }
-      }
-      if (!matchingSeat) {
-        throw new NotFoundException('해당하는 좌석이 없습니다.');
-      }
-      // 포인트 확인
-      const user = await this.getUserAndPoints(userId);
-
-      const point = await this.pointRepository.findOne({
-        where: { userId },
-      });
-      if (point.total < matchingSeat.seatPrice) {
-        throw new BadRequestException('포인트가 부족합니다.');
-      }
-      await queryRunner.manager.save(point);
-
-      this.seatRepository.softDelete(matchingSeat);
-
-      const totalPoint = point.total - matchingSeat.seatPrice;
-      point.total = totalPoint;
-      const reservation = await this.reservationRepository.create({
-        userId: user.id,
-        performanceId: createReservationDto.performanceId,
-        seatId: createReservationDto.seatNum,
-        price: matchingSeat.seatPrice,
-      });
-      await queryRunner.manager.save(reservation);
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      console.log(err);
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   // Transaction Test
   /**퍼포먼스 찾기 */
-  private async verifyPerformanceById(id: number) {
+  async verifyPerformanceById(id: number) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();

@@ -15,5 +15,6 @@ import { Reservation } from 'src/reservation/entities/reservation.entity';
   ],
   providers: [PerformanceService],
   controllers: [PerformanceController],
+  exports: [PerformanceService],
 })
 export class PerformanceModule {}

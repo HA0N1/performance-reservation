@@ -12,7 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import _ from 'lodash';
 import { LoginUserDto } from './dto/login-user.dto';
 import { compare, hash } from 'bcrypt';
-import { Point } from 'src/point/entities/point.entity';
+import { Point } from 'src/user/entities/point.entity';
 
 @Injectable()
 export class UserService {
@@ -24,6 +24,7 @@ export class UserService {
     private readonly jwtService: JwtService, // JWT 토큰 생성을 위해 주입한 서비스
   ) {}
 
+  //회원가입
   async register(createUserDto: CreateUserDto) {
     const { email, password, nickname, isAdmin } = createUserDto;
     const existingUser = await this.findByEmail(email); // 유저가 있는지 확인하기.
@@ -43,15 +44,22 @@ export class UserService {
       total: Number(1000000),
     });
     await this.pointRepository.save(point);
+    return { message: '회원가입이 완료되었습니다.' };
   }
-  async login(loginUserDto: LoginUserDto): Promise<string> {
+  // 로그인
+  async login(loginUserDto: LoginUserDto): Promise<any> {
     const { email, password } = loginUserDto;
+    /**
+     * 그로스 : findOneBy는 select를 사용 못함
+      => entity에서 password를 select : false했기 때문에 password를 가지고 오지 못함
+      => DB PW와 로그인PW 비교 불가
+     */
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: ['password'], // entity에서 password를 select : false 했기 때문에 직접 골라줘야함.
+      select: ['id', 'password'], // entity에서 password를 select : false 했기 때문에 직접 골라줘야함.
     });
-
+    // 이메일로 조회했는데 존재하지 않을때
     if (_.isNil(user)) {
       throw new NotFoundException('이메일을 확인해주세요.');
     }
@@ -61,14 +69,16 @@ export class UserService {
     }
 
     //로그인 성공 후 JWT 토큰 생성
+    // header (token type) / payload (data) / signature (secret key)
     const payload = { email, id: user.id };
     const accessToken = await this.jwtService.signAsync(payload); // 알아서 시크릿키랑 페이로드 섞어서 만들어줌
-    return accessToken;
+    return { id: user.id, accessToken };
   }
 
   async findByEmail(email: string): Promise<{}> {
     return await this.userRepository.findOneBy({ email });
   }
+  // 프로필 조회
   async getUserAndPoints(userId: number) {
     return this.userRepository.findOne({
       where: { id: userId },

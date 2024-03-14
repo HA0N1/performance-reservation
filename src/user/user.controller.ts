@@ -13,8 +13,10 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './utils/userInfo.decorator';
 import { User } from './entities/user.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
+@ApiTags('사용자')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

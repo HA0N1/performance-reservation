@@ -1,19 +1,11 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import { User } from '../entities/user.entity';
 
-export class CreateUserDto {
-  @IsEmail()
-  @IsNotEmpty({ message: '이메일을 입력해주세요.' })
-  email: string;
-
-  @IsString()
-  @IsNotEmpty({ message: '닉네임을 입력해주세요.' })
-  nickname: string;
-
-  @IsString()
-  @IsNotEmpty({ message: '비밀번호를 입력해주세요.' })
-  password: string;
-
-  @IsBoolean()
-  @IsNotEmpty({ message: '권한을 설정해주세요.' })
-  isAdmin: boolean;
-}
+// 그로스 : 제너럴 타입을 통해 entity에서 한 번에
+// PickType은 스웨거로 가져오기
+export class CreateUserDto extends PickType(User, [
+  'email',
+  'nickname',
+  'password',
+  'isAdmin',
+]) {}

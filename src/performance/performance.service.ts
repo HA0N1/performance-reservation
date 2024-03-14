@@ -10,7 +10,7 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Performance } from './entities/performance.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
-import { Point } from 'src/point/entities/point.entity';
+import { Point } from 'src/user/entities/point.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { parse } from 'papaparse';

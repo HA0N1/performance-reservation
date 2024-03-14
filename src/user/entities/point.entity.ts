@@ -1,4 +1,3 @@
-import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({
   name: 'point',
@@ -29,6 +30,6 @@ export class Point {
   updatedAt: Date;
 
   @OneToOne(() => User, (user) => user.point, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn()
   user: User;
 }

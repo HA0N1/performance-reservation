@@ -7,8 +7,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { Point } from './point/entities/point.entity';
-import { PointModule } from './point/point.module';
+import { Point } from './user/entities/point.entity';
 import { Performance } from './performance/entities/performance.entity';
 import { PerformanceModule } from './performance/performance.module';
 import { Seat } from './seat/entities/seat.entity';
@@ -21,7 +20,7 @@ const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
-    namingStrategy: new SnakeNamingStrategy(),
+    namingStrategy: new SnakeNamingStrategy(), // 자동으로 DB에 스네이프 케이스로
     type: 'mysql',
     username: configService.get('DB_USERNAME'),
     password: configService.get('DB_PASSWORD'),
@@ -30,7 +29,7 @@ const typeOrmModuleOptions = {
     database: configService.get('DB_NAME'),
     entities: [User, Point, Reservation, Seat, Performance],
     synchronize: configService.get('DB_SYNC'),
-    logging: true,
+    logging: true, // row query 출력
   }),
   inject: [ConfigService],
 };
@@ -38,7 +37,8 @@ const typeOrmModuleOptions = {
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // 전역에서 사용 => 별도로 다른곳에서 import 하지 않아도 됨
+      // 환경변수 유효성 검사
       validationSchema: Joi.object({
         JWT_SECRET_KEY: Joi.string().required(),
         DB_USERNAME: Joi.string().required(),
@@ -52,7 +52,6 @@ const typeOrmModuleOptions = {
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     AuthModule,
     UserModule,
-    PointModule,
     PerformanceModule,
     ReservationModule,
     SeatModule,

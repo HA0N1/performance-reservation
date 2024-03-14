@@ -1,0 +1,10 @@
+### 회원가입
+POST http://localhost:3000/user/register
+Content-Type: application/json
+
+{
+  "email": "4@test.com",
+  "nickname": "춘식",
+  "password" : "123456",
+  "isAdmin" : true
+}

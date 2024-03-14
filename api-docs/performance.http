@@ -1,0 +1,18 @@
+### 공연 생성
+
+POST http://localhost:3000/performance/registration
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjFAdGVzdC5jb20iLCJpYXQiOjE3MTAzNTQ1NjF9.4Wr9wbh37ZCcxKxvmrFRlz5QvcHf3R9R6yb_2aKeY8w
+Content-Type: application/json
+
+{
+"title": "1",
+"description" : "w",
+"category" : "musical",
+"price": "1",
+"dateTime": "2024-02-12",
+"image": "user",
+"hall": "예술의 전당",
+"standardLimit" : 2,
+"royalLimit" : 2,
+"vipLimit" : 2 
+}

@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Reservation } from './entities/reservation.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
-import { Point } from 'src/point/entities/point.entity';
+import { Point } from 'src/user/entities/point.entity';
 import { PerformanceService } from 'src/performance/performance.service';
 
 @Module({

@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reservation } from './entities/reservation.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
-import { Point } from 'src/point/entities/point.entity';
+import { Point } from 'src/user/entities/point.entity';
 import { DataSource, Repository } from 'typeorm';
 import _ from 'lodash';
 import { PerformanceService } from 'src/performance/performance.service';

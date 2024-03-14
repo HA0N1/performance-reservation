@@ -16,13 +16,16 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/user/utils/userInfo.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('performance')
+@ApiTags('공연')
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
   // 공연 생성
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('jwt')
   @Post('/registration')
   // @UseInterceptors(FileInterceptor('file'))
   async createPerformance(

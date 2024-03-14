@@ -6,15 +6,16 @@ import {
   Param,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PerformanceService } from './performance.service';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/user/utils/userInfo.decorator';
 import { User } from 'src/user/entities/user.entity';
-import { CreateReservationDto } from './dto/create-reservation.dto';
-import { CreateSeatDto } from './dto/create-seat.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('performance')
 export class PerformanceController {
@@ -23,7 +24,9 @@ export class PerformanceController {
   // 공연 생성
   @UseGuards(AuthGuard('jwt'))
   @Post('/registration')
+  // @UseInterceptors(FileInterceptor('file'))
   async createPerformance(
+    // @UploadedFile() file: Express.Multer.File,
     @Body() createPerformanceDto: CreatePerformanceDto,
     @UserInfo() user: User,
   ) {
@@ -31,6 +34,7 @@ export class PerformanceController {
     if (!user.isAdmin)
       throw new ForbiddenException('공연을 등록할 권한이 없습니다.');
     const performance = await this.performanceService.createPerformance(
+      // file,
       createPerformanceDto,
       user.id,
     );

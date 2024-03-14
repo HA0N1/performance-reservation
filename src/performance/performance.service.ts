@@ -13,6 +13,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Point } from 'src/point/entities/point.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
+import { parse } from 'papaparse';
 
 @Injectable()
 export class PerformanceService {
@@ -32,9 +33,35 @@ export class PerformanceService {
   }
   /**공연 생성 */
   async createPerformance(
+    // file: Express.Multer.File,
     createPerformanceDto: CreatePerformanceDto,
     id: number,
   ) {
+    // if (!file.originalname.endsWith('.csv')) {
+    //   throw new BadRequestException('CSV 파일만 업로드 가능합니다.');
+    // }
+
+    // const csvContent = file.buffer.toString();
+
+    // let parseResult;
+    // try {
+    //   parseResult = parse(csvContent, {
+    //     header: true,
+    //     skipEmptyLines: true,
+    //   });
+    // } catch (error) {
+    //   throw new BadRequestException('CSV 파싱에 실패했습니다.');
+    // }
+
+    // const teamsData = parseResult.data as any[];
+
+    // for (const teamData of teamsData) {
+    //   if (_.isNil(teamData.name) || !teamData.description) {
+    //     throw new BadRequestException(
+    //       'CSV 파일은 name과 description 컬럼을 포함해야 합니다.',
+    //     );
+    //   }
+    // }
     await this.findUser(id);
     const performance: Performance = this.performanceRepository.create({
       ...createPerformanceDto,

@@ -36,6 +36,10 @@ export class ReservationService {
       throw new NotFoundException('존재하지 않는 공연입니다.');
 
     // 예매 가능 좌석 조회
+    /**
+     * id 없이 반환 받고 싶은데 어떻게 할까요?
+     * 함수로 돌려서 특정 요소만 받자니 다른 함수(reservation)내에서 id를 참조해요
+     */
     const seats = await this.seatRepository.find({
       where: { performanceId: id, deletedAt: null },
       select: ['id', 'seatNum', 'grade', 'seatPrice'],

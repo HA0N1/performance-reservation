@@ -19,16 +19,11 @@ async function bootstrap() {
     .setTitle('Ticketing')
     .setDescription('performanace reservation')
     .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        name: 'jwt',
-        description: 'accses token',
-        in: 'header',
-      },
-      'token',
-    )
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    })
     .addTag('cats')
     .build();
   const document = SwaggerModule.createDocument(app, config);

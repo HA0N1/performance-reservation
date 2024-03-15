@@ -40,26 +40,43 @@ export class UserService {
     });
     await this.userRepository.save(user);
     const point = this.pointRepository.create({
-      userId: user.id,
+      user,
       total: Number(1000000),
     });
     await this.pointRepository.save(point);
-    return { message: '회원가입이 완료되었습니다.' };
+    return { message: '회원 가입이 완료되었습니다' };
   }
   // 로그인
-  async login(loginUserDto: LoginUserDto): Promise<any> {
-    const { email, password } = loginUserDto;
+  async login(email: string, id: number): Promise<any> {
+    // 로그인 성공 후 JWT 토큰 생성
+    // header (token type) / payload (data) / signature (secret key)
+    const payload = { email, id };
+    const accessToken = await this.jwtService.signAsync(payload); // 알아서 시크릿키랑 페이로드 섞어서 만들어줌
+    return { accessToken };
+  }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
+  }
+  // 프로필 조회
+  async getUserAndPoints(userId: number) {
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['point'], // 'point' 관계를 포함하여 가져옴
+    });
+  }
+
+  // 그로스 : passport-local를 위한 유저 인증
+  async validateUser({ email, password }: LoginUserDto) {
     /**
      * 그로스 : findOneBy는 select를 사용 못함
       => entity에서 password를 select : false했기 때문에 password를 가지고 오지 못함
       => DB PW와 로그인PW 비교 불가
      */
-
     const user = await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'password'], // entity에서 password를 select : false 했기 때문에 직접 골라줘야함.
+      select: { id: true, password: true },
     });
-    // 이메일로 조회했는데 존재하지 않을때
     if (_.isNil(user)) {
       throw new NotFoundException('이메일을 확인해주세요.');
     }
@@ -67,22 +84,12 @@ export class UserService {
     if (!(await compare(password, user.password))) {
       throw new UnauthorizedException('비밀번호를 확인해주세요.');
     }
-
-    //로그인 성공 후 JWT 토큰 생성
-    // header (token type) / payload (data) / signature (secret key)
-    const payload = { email, id: user.id };
-    const accessToken = await this.jwtService.signAsync(payload); // 알아서 시크릿키랑 페이로드 섞어서 만들어줌
-    return { id: user.id, accessToken };
-  }
-
-  async findByEmail(email: string): Promise<{}> {
-    return await this.userRepository.findOneBy({ email });
-  }
-  // 프로필 조회
-  async getUserAndPoints(userId: number) {
-    return this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['point'],
-    });
+    // user? => user가 없어도 오류 없이 undefined 반환.
+    // ?? '' => 널병합 연산자 user?.password가 null or undefined 일 시 빈 문자열 반환
+    const isPasswordMatchd = compare(password, user?.password ?? '');
+    if (!user || !isPasswordMatchd) {
+      return null;
+    }
+    return { id: user.id };
   }
 }

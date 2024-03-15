@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Req,
+  Request,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -13,7 +14,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './utils/userInfo.decorator';
 import { User } from './entities/user.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 @ApiTags('사용자')
@@ -22,27 +23,35 @@ export class UserController {
 
   @Post('/register')
   async createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return await this.userService.register(createUserDto);
+    const data = await this.userService.register(createUserDto);
+    return { message: '회원가입이 완료되었습니다.', data };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/me')
+  //커스텀 데코레이터
+  async getEmail(@UserInfo() user: User) {
+    console.log('UserController ~ getEmail ~ user:', user);
+    const userInfoWithPoints = await this.userService.getUserAndPoints(user.id);
+
+    return {
+      nickname: userInfoWithPoints.nickname,
+      point: userInfoWithPoints.point.total,
+    };
+  }
+  @UseGuards(AuthGuard('local'))
   @Post('/login')
-  async login(@Body(ValidationPipe) loginUserDto: LoginUserDto) {
-    return await this.userService.login(loginUserDto);
+  async login(
+    @Request() req,
+    //loginUserDto는 AuthGuard가 사용하기 때문에 넣어줌
+    @Body(ValidationPipe) loginUserDto: LoginUserDto,
+  ) {
+    return await this.userService.login(loginUserDto.email, req.user.id);
   }
   // @Post('test')
   // @UseGuards(AuthGuard('jwt'))
   // test(@UserInfo() user: User) {
   //   console.log(user);
   // }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/me')
-  //커스텀 데코레이터
-  async getEmail(@UserInfo() user: User) {
-    const userInfoWithPoints = await this.userService.getUserAndPoints(user.id);
-    return {
-      nickname: userInfoWithPoints.nickname,
-      point: userInfoWithPoints.point.total,
-    };
-  }
 }

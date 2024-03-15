@@ -12,6 +12,7 @@ import _ from 'lodash';
 import { PerformanceService } from 'src/performance/performance.service';
 import { CreateReservationDto } from 'src/performance/dto/create-reservation.dto';
 import { DeleteReservationDto } from './dto/delete-reservation.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ReservationService {
@@ -19,8 +20,8 @@ export class ReservationService {
     private dataSource: DataSource,
     @InjectRepository(Reservation)
     private readonly reservationRepository: Repository<Reservation>,
-    @InjectRepository(Performance)
-    private readonly performanceRepository: Repository<Reservation>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
     @InjectRepository(Point)
@@ -80,9 +81,9 @@ export class ReservationService {
       const user = await this.performanceService.getUserAndPoints(userId);
 
       const point = await this.pointRepository.findOne({
-        where: { userId },
+        where: { id: user.id },
       });
-      console.log('ReservationService ~ point:', point);
+
       if (point.total < matchingSeat.seatPrice) {
         throw new BadRequestException('포인트가 부족합니다.');
       }
@@ -128,9 +129,10 @@ export class ReservationService {
       });
       if (seat.deletedAt === null)
         throw new BadRequestException('예매된 좌석이 아닙니다.');
+      const user = await this.userRepository.findOne({ where: { id } });
       // 1. Point Repository 복구 (seat price만큼 => Reservation Repository price만큼?)
       const point: Point = await this.pointRepository.findOne({
-        where: { userId },
+        where: { id: user.id },
       });
       let totalPoint: number = Number(point.total) + Number(seat.seatPrice);
       point.total = Number(totalPoint);

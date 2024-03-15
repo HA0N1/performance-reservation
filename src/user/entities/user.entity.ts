@@ -12,7 +12,14 @@ import {
 } from 'typeorm';
 import { Reservation } from 'src/reservation/entities/reservation.entity';
 import { Point } from './point.entity';
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
+import { UserRole } from '../types/user-role.type';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -54,10 +61,9 @@ export class User {
    * 등급
    * @example true
    */
-  @IsBoolean()
-  @IsNotEmpty({ message: '권한을 설정해주세요.' })
-  @Column({ type: 'boolean', nullable: false, default: false })
-  isAdmin: boolean;
+  @IsEnum(UserRole)
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.Customer })
+  role: UserRole;
 
   @CreateDateColumn()
   createdAt: Date;

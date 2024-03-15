@@ -1,22 +1,21 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PerformanceService } from './performance.service';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/user/utils/userInfo.decorator';
 import { User } from 'src/user/entities/user.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRole } from 'src/user/types/user-role.type';
+import { Roles } from 'src/user/utils/roles.decorator';
 
 @Controller('performance')
 @ApiTags('공연')
@@ -24,8 +23,11 @@ export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
   // 공연 생성
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('jwt')
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.Admin)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('/registration')
   // @UseInterceptors(FileInterceptor('file'))
   async createPerformance(
@@ -33,9 +35,8 @@ export class PerformanceController {
     @Body() createPerformanceDto: CreatePerformanceDto,
     @UserInfo() user: User,
   ) {
+    console.log('PerformanceController ~ user:', user);
     await this.performanceService.findUser(user.id);
-    if (!user.isAdmin)
-      throw new ForbiddenException('공연을 등록할 권한이 없습니다.');
     const performance = await this.performanceService.createPerformance(
       // file,
       createPerformanceDto,

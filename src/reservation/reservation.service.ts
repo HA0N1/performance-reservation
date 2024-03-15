@@ -152,4 +152,13 @@ export class ReservationService {
       await queryRunner.release();
     }
   }
+  /**예매 목록 조회 */
+  async findAll(userId: number) {
+    const reservation = await this.reservationRepository.find({
+      where: { id: userId },
+      relations: ['performance'],
+    });
+
+    return reservation;
+  }
 }

@@ -26,7 +26,7 @@ export class UserService {
 
   //회원가입
   async register(createUserDto: CreateUserDto) {
-    const { email, password, nickname, isAdmin } = createUserDto;
+    const { email, password, nickname, role } = createUserDto;
     const existingUser = await this.findByEmail(email); // 유저가 있는지 확인하기.
     if (!_.isNil(existingUser))
       throw new ConflictException('이미 가입된 email입니다.');
@@ -36,7 +36,7 @@ export class UserService {
       email,
       password: hashedPassword,
       nickname,
-      isAdmin,
+      role,
     });
     await this.userRepository.save(user);
     const point = this.pointRepository.create({

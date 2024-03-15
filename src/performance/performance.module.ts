@@ -4,7 +4,6 @@ import { PerformanceController } from './performance.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Performance } from './entities/performance.entity';
 import { User } from 'src/user/entities/user.entity';
-import { AuthModule } from 'src/auth/auth.module';
 import { Seat } from 'src/seat/entities/seat.entity';
 import { Point } from 'src/user/entities/point.entity';
 import { Reservation } from 'src/reservation/entities/reservation.entity';

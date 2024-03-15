@@ -23,6 +23,6 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
   ],
   providers: [UserService, LocalStrategy, JwtStrategy],
   controllers: [UserController],
-  exports: [UserService],
+  exports: [TypeOrmModule.forFeature([User]), UserService],
 })
 export class UserModule {}

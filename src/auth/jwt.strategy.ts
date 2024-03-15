@@ -13,6 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
   ) {
     super({
+      //ExtractJwt => 어디서 jwt를 빼올거냐
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // header에서 bearer 타입으로 넘어오는 토큰을 가져오겠다.
       ignoreExpiration: false,
       secretOrKey: configService.get('JWT_SECRET_KEY'),
@@ -25,6 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (_.isNil(user)) {
       throw new NotFoundException('해당하는 사용자를 찾을 수 없습니다.');
     }
-    return user;
+    return user; //req.user
   }
 }

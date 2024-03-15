@@ -1,18 +1,15 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Performance } from '../../performance/entities/performance.entity';
 import { Seat } from 'src/seat/entities/seat.entity';
 import { User } from 'src/user/entities/user.entity';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({
   name: 'reservation',

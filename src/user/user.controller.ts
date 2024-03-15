@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Req,
   Request,
   UseGuards,
   ValidationPipe,
@@ -15,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './utils/userInfo.decorator';
 import { User } from './entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('user')
 @ApiTags('사용자')
@@ -27,8 +27,8 @@ export class UserController {
     return { message: '회원가입이 완료되었습니다.', data };
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth() // swagger에서 api에 자물쇠 모양
+  @UseGuards(JwtAuthGuard)
   @Get('/me')
   //커스텀 데코레이터
   async getEmail(@UserInfo() user: User) {
